@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://OQ_Toolkit/OQ_ARVRCamera.tscn" type="PackedScene" id=1]
 [ext_resource path="res://OQ_Toolkit/OQ_ARVROrigin.tscn" type="PackedScene" id=2]
@@ -6,10 +6,48 @@
 [ext_resource path="res://Main.gd" type="Script" id=4]
 [ext_resource path="res://OQ_Toolkit/OQ_RightController.tscn" type="PackedScene" id=5]
 [ext_resource path="res://OQ_Toolkit/OQ_ARVROrigin/Locomotion_Stick.tscn" type="PackedScene" id=6]
+[ext_resource path="res://OQ_Toolkit/OQ_Classes/OQClass_GrabbableRigidBody.gd" type="Script" id=7]
+[ext_resource path="res://OQ_Toolkit/OQ_ARVRController/Feature_RigidBodyGrab.tscn" type="PackedScene" id=8]
+[ext_resource path="res://OQ_Toolkit/OQ_ARVROrigin/Feature_VRSimulator.tscn" type="PackedScene" id=9]
+[ext_resource path="res://assets/plants_foliage_1379_1697_Small.jpg" type="Texture" id=10]
+[ext_resource path="res://OQ_Toolkit/OQ_ARVROrigin/Feature_PlayerCollision.tscn" type="PackedScene" id=11]
+[ext_resource path="res://OQ_Toolkit/OQ_ARVROrigin/Feature_Falling.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Features/Feature_Jump.tscn" type="PackedScene" id=13]
 
-[sub_resource type="PrismMesh" id=1]
+[sub_resource type="CubeMesh" id=1]
 
-[node name="Spatial" type="Spatial"]
+[sub_resource type="SpatialMaterial" id=2]
+flags_unshaded = true
+params_diffuse_mode = 1
+albedo_texture = ExtResource( 10 )
+uv1_scale = Vector3( 10, 10, 10 )
+uv1_triplanar = true
+
+[sub_resource type="BoxShape" id=3]
+extents = Vector3( 0.259266, 0.277464, 0.22144 )
+
+[sub_resource type="PrismMesh" id=4]
+
+[sub_resource type="SpatialMaterial" id=5]
+albedo_color = Color( 0.827451, 0.682353, 0.682353, 1 )
+metallic = 0.46
+metallic_specular = 0.84
+roughness = 0.0
+
+[sub_resource type="BoxShape" id=6]
+extents = Vector3( 0.17223, 0.211705, 0.233779 )
+
+[sub_resource type="CubeMesh" id=7]
+
+[sub_resource type="BoxShape" id=8]
+extents = Vector3( 0.458817, 0.402272, 1 )
+
+[sub_resource type="BoxShape" id=10]
+extents = Vector3( 0.224183, 0.218819, 0.221203 )
+
+[sub_resource type="CubeMesh" id=9]
+
+[node name="Game" type="Spatial"]
 script = ExtResource( 4 )
 
 [node name="OQ_ARVROrigin" parent="." instance=ExtResource( 2 )]
@@ -18,14 +56,97 @@ script = ExtResource( 4 )
 
 [node name="OQ_LeftController" parent="OQ_ARVROrigin" instance=ExtResource( 3 )]
 
+[node name="Feature_RigidBodyGrab" parent="OQ_ARVROrigin/OQ_LeftController" instance=ExtResource( 8 )]
+
 [node name="OQ_RightController" parent="OQ_ARVROrigin" instance=ExtResource( 5 )]
 
+[node name="Feature_RigidBodyGrab" parent="OQ_ARVROrigin/OQ_RightController" instance=ExtResource( 8 )]
+
+[node name="Feature_Jump" parent="OQ_ARVROrigin/OQ_RightController" instance=ExtResource( 13 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, -1.5, 0.5 )
+
 [node name="Locomotion_Stick" parent="OQ_ARVROrigin" instance=ExtResource( 6 )]
+move_speed = 4.0
+enable_vignette = true
 
-[node name="RigidBody" type="RigidBody" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0892634, 1.02516, 0.134745 )
-sleeping = true
+[node name="Feature_Falling" parent="OQ_ARVROrigin" instance=ExtResource( 12 )]
 
-[node name="MeshInstance" type="MeshInstance" parent="RigidBody"]
+[node name="Feature_PlayerCollision" parent="OQ_ARVROrigin" instance=ExtResource( 11 )]
+
+[node name="Feature_VRSimulator" parent="OQ_ARVROrigin" instance=ExtResource( 9 )]
+walk_speed = 5.0
+
+[node name="World" type="Spatial" parent="."]
+
+[node name="Floor_Main" type="MeshInstance" parent="World"]
+transform = Transform( 25.9948, 0, 0, 0, 0.117289, 0, 0, 0, 23.7781, 0.18724, -0.0975423, 0.00288963 )
 mesh = SubResource( 1 )
+material/0 = SubResource( 2 )
+
+[node name="StaticBody" type="StaticBody" parent="World/Floor_Main"]
+
+[node name="CollisionShape" type="CollisionShape" parent="World/Floor_Main/StaticBody"]
+transform = Transform( 3.81101, 0, 0, 0, 4.44073, 0, 0, 0, 4.47236, 0, 0, 0 )
+shape = SubResource( 3 )
+
+[node name="RigidBody" type="RigidBody" parent="World"]
+transform = Transform( 0.999999, 0, 0, 0, 1, 0, 0, 0, 1, -0.0892641, 2.45552, -3.58594 )
+script = ExtResource( 7 )
+
+[node name="MeshInstance" type="MeshInstance" parent="World/RigidBody"]
+mesh = SubResource( 4 )
+material/0 = SubResource( 5 )
+
+[node name="CollisionShape" type="CollisionShape" parent="World/RigidBody"]
+transform = Transform( 4.55547, 0, 0, 0, 4.57995, 0, 0, 0, 4.46006, 0, 0, 0 )
+shape = SubResource( 6 )
+
+[node name="RigidBody2" type="RigidBody" parent="World"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5.32227, 1.12094, -10.7197 )
+script = ExtResource( 7 )
+
+[node name="MeshInstance" type="MeshInstance" parent="World/RigidBody2"]
+transform = Transform( 0.300851, 0, 0, 0, 0.284382, 0, 0, 0, 0.297256, 0, 0, 0 )
+mesh = SubResource( 7 )
+material/0 = null
+
+[node name="CollisionShape" type="CollisionShape" parent="World/RigidBody2"]
+transform = Transform( 0.67801, 0, 0, 0, 0.73746, 0, 0, 0, 0.338335, 0, 0, 0 )
+shape = SubResource( 8 )
+
+[node name="RigidBody3" type="RigidBody" parent="World"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.17458, 1.12094, -10.7197 )
+script = ExtResource( 7 )
+
+[node name="MeshInstance" type="MeshInstance" parent="World/RigidBody3"]
+transform = Transform( 0.462905, 0, 0, 0, 0.402824, 0, 0, 0, 0.409719, 0, 0, 0 )
+mesh = SubResource( 7 )
+material/0 = null
+
+[node name="CollisionShape" type="CollisionShape" parent="World/RigidBody3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 0.435113, 0, 0, 0 )
+shape = SubResource( 8 )
+
+[node name="RigidBody4" type="RigidBody" parent="World"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.81465, 1.12094, -14.8771 )
+script = ExtResource( 7 )
+
+[node name="MeshInstance" type="MeshInstance" parent="World/RigidBody4"]
+transform = Transform( 0.462905, 0, 0, 0, 0.402824, 0, 0, 0, 0.409719, 0, 0, 0 )
+mesh = SubResource( 7 )
+material/0 = null
+
+[node name="CollisionShape" type="CollisionShape" parent="World/RigidBody4"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 0.435113, 0, 0, 0 )
+shape = SubResource( 8 )
+
+[node name="StaticBody" type="StaticBody" parent="World"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 6.58515, 1.19057, -8.64423 )
+
+[node name="CollisionShape" type="CollisionShape" parent="World/StaticBody"]
+transform = Transform( 4.50002, 0, 0, 0, 4.64055, 0, 0, 0, 4.66206, 0, 0, 0 )
+shape = SubResource( 10 )
+
+[node name="MeshInstance" type="MeshInstance" parent="World/StaticBody"]
+mesh = SubResource( 9 )
 material/0 = null

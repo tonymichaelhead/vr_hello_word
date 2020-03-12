@@ -3,7 +3,7 @@ extends ARVRController
 
 
 # When set to true it will try to detect and load a model
-export var autoload_model = true;
+export var autoload_model = false;
 
 # if set to true it will propagate the hand pinch gestures as axis events
 export var hand_pinch_to_axis = false;

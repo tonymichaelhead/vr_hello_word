@@ -64,6 +64,8 @@ func move(dt):
 		return;
 		
 	if (enable_vignette) : movement_vignette_rect.visible = true;
+	print('enabez vvignz');
+	print(movement_vignette_rect.visible)
 		
 	var view_dir = -vr.vrCamera.global_transform.basis.z;
 	var strafe_dir = vr.vrCamera.global_transform.basis.x;
